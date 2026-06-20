@@ -1,0 +1,180 @@
+@{
+    ViewData["Title"] = "Video Frame Parser";
+}
+
+<div class="page-header">
+    <div class="container">
+        <a class="back-link" asp-controller="Home" asp-action="Index">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            All Tools
+        </a>
+        <h1 class="page-title">Video Frame Parser</h1>
+        <p class="page-sub">Extract frames from any video and download them as a ZIP archive.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div id="errorBanner" class="alert alert-error" hidden>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="errorText"></span>
+    </div>
+
+    <form id="parseForm" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="file" name="VideoFile" id="videoFileInput" accept="video/*,.mkv,.avi,.flv,.wmv" hidden />
+
+        <div id="emptyState">
+            <div class="empty-state" id="dropzone">
+                <div class="empty-icon">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="2.5"/>
+                        <path d="M2 8h20M8 2v6M16 2v6"/>
+                        <path d="M10 13l4 2.5-4 2.5V13z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="empty-title">Drop your video here</p>
+                    <p class="empty-sub" style="margin-top:.35rem">or <button type="button" class="btn-link" id="browseBtn">browse files</button> from your computer</p>
+                </div>
+                <p class="empty-hint">MP4 · MOV · AVI · MKV · WEBM · FLV · WMV &nbsp;-&nbsp; up to 1 GB</p>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <p class="info-title">How it works</p>
+                    <ol class="info-steps">
+                        <li>Upload your video (up to 1&nbsp;GB)</li>
+                        <li>Name your frames and configure settings</li>
+                        <li>Click Extract - FFmpeg processes it locally</li>
+                        <li>Download all frames as a single ZIP</li>
+                    </ol>
+                </div>
+                <div class="info-card">
+                    <p class="info-title">Supported formats</p>
+                    <div class="format-tags">
+                        <span class="tag">MP4</span><span class="tag">MOV</span><span class="tag">AVI</span>
+                        <span class="tag">MKV</span><span class="tag">WEBM</span><span class="tag">FLV</span>
+                        <span class="tag">WMV</span><span class="tag">M4V</span><span class="tag">MPEG</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="videoState" hidden>
+            <div class="video-section">
+
+                <div class="video-card">
+                    <div class="video-player-wrap">
+                        <video id="videoPlayer" class="video-player" controls playsinline preload="metadata"></video>
+                    </div>
+                    <div class="video-meta">
+                        <div class="video-info">
+                            <div class="video-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="video-name" id="videoName">-</p>
+                                <p class="video-size" id="videoSize">-</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-reset" id="resetBtn">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                            Remove
+                        </button>
+                    </div>
+                </div>
+
+                <div class="options-card">
+                    <div class="options-header">
+                        <p class="options-title">Extract Settings</p>
+                    </div>
+
+                    <div class="options-row">
+                        <div class="option-group" style="flex:2;min-width:200px">
+                            <label class="option-label" for="baseName">Output File Name</label>
+                            <input type="text" name="BaseName" id="baseName" class="text-input"
+                                   value="frame" placeholder="e.g. MyShot"
+                                   pattern="^[a-zA-Z0-9][a-zA-Z0-9_-]*$"
+                                   maxlength="120" autocomplete="off" spellcheck="false" />
+                            <p class="field-hint">Letters, numbers, <code>-</code> and <code>_</code> only &nbsp;→&nbsp; <span id="namePreview">frame-001.jpg</span></p>
+                            <p class="field-error" id="nameError" hidden>Must start with a letter or number and contain only letters, numbers, hyphens or underscores.</p>
+                        </div>
+                    </div>
+
+                    <div class="options-row">
+                        <div class="option-group">
+                            <label class="option-label" for="fps">Frame Rate</label>
+                            <select name="Fps" id="fps" class="select">
+                                <option value="0" selected>Native - every frame</option>
+                                <option value="1">1 fps</option>
+                                <option value="3">3 fps</option>
+                                <option value="5">5 fps</option>
+                                <option value="10">10 fps</option>
+                                <option value="15">15 fps</option>
+                                <option value="20">20 fps</option>
+                                <option value="25">25 fps</option>
+                                <option value="30">30 fps</option>
+                                <option value="60">60 fps</option>
+                                <option value="120">120 fps</option>
+                            </select>
+                        </div>
+                        <div class="option-group">
+                            <label class="option-label" for="format">Output Format</label>
+                            <select name="Format" id="format" class="select">
+                                <option value="jpg" selected>JPEG - smaller files</option>
+                                <option value="png">PNG - lossless</option>
+                                <option value="webp">WebP - modern, efficient</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="options-row options-row--toggle">
+                        <label class="toggle-label" for="stripMetadata">
+                            <span class="toggle-wrap">
+                                <input type="checkbox" name="StripMetadata" id="stripMetadata" value="true" class="toggle-input" />
+                                <span class="toggle-track">
+                                    <span class="toggle-thumb"></span>
+                                </span>
+                            </span>
+                            <span class="toggle-text">
+                                Strip metadata
+                                <span class="toggle-desc">Removes EXIF, GPS and embedded tags from output frames</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="actions-row">
+                        <button type="submit" class="btn-primary" id="submitBtn">
+                            <span class="btn-label">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                Extract Frames
+                            </span>
+                            <span class="btn-processing" hidden>
+                                <span class="spinner"></span>
+                                Extracting…
+                            </span>
+                        </button>
+                        <p class="actions-hint">Processing time depends on video length and frame rate.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+<script src="~/js/videoFrameParser.js" asp-append-version="true"></script>
+}

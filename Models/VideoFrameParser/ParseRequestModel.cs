@@ -1,0 +1,21 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace Framedit.Models.VideoFrameParser;
+
+public class ParseRequestModel
+{
+    [Required]
+    public IFormFile? VideoFile { get; set; }
+
+    public double Fps { get; set; } = 0;
+
+    [Required]
+    [MaxLength(120)]
+    [RegularExpression(@"^[a-zA-Z0-9][a-zA-Z0-9_-]*$",
+        ErrorMessage = "Base name may only contain letters, numbers, hyphens (-) and underscores (_), and must start with a letter or number.")]
+    public string BaseName { get; set; } = "frame";
+
+    public string Format { get; set; } = "jpg";
+
+    public bool StripMetadata { get; set; } = false;
+}
