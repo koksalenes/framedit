@@ -1,4 +1,5 @@
 using Framedit.Services.MetadataCleaner;
+using Framedit.Services.SoundParser;
 using Framedit.Services.VideoFrameParser;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,10 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IFrameParserService, FrameParserService>();
 builder.Services.AddScoped<IMetadataCleanerService, MetadataCleanerService>();
+builder.Services.AddScoped<ISoundParserService, SoundParserService>();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxRequestBodySize = 1_073_741_824; // 1 GB
+    options.Limits.MaxRequestBodySize = 1_000_000_000;
 });
 
 var app = builder.Build();
