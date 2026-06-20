@@ -28,7 +28,7 @@ public class MetadataCleanerController : Controller
     public IActionResult Index() => View();
 
     [HttpPost("clean")]
-    [RequestSizeLimit(1_073_741_824)]
+    [RequestSizeLimit(1_000_000_000)]
     [RequestFormLimits(MultipartBodyLengthLimit = 1_000_000_000, ValueCountLimit = 50)]
     public async Task<IActionResult> Clean(IFormFileCollection files, CancellationToken ct)
     {

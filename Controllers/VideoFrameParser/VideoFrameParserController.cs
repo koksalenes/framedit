@@ -28,8 +28,8 @@ public class VideoFrameParserController : Controller
     public IActionResult Index() => View();
 
     [HttpPost("parse")]
-    [RequestSizeLimit(1_073_741_824)]
-    [RequestFormLimits(MultipartBodyLengthLimit = 1_073_741_824)]
+    [RequestSizeLimit(1_000_000_000)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 1_000_000_000)]
     public async Task<IActionResult> Parse([FromForm] ParseRequestModel model, CancellationToken ct)
     {
         if (!ModelState.IsValid)
