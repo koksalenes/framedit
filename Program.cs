@@ -1,3 +1,4 @@
+using Framedit.Services.ImageOptimizer;
 using Framedit.Services.MetadataCleaner;
 using Framedit.Services.SoundParser;
 using Framedit.Services.VideoFrameParser;
@@ -8,6 +9,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IFrameParserService, FrameParserService>();
 builder.Services.AddScoped<IMetadataCleanerService, MetadataCleanerService>();
 builder.Services.AddScoped<ISoundParserService, SoundParserService>();
+builder.Services.AddScoped<IImageOptimizerService, ImageOptimizerService>();
 
 builder.WebHost.ConfigureKestrel(options =>
 {

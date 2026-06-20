@@ -72,8 +72,8 @@
                 </div>
             </a>
 
-            <div class="tool-card tool-card--disabled">
-                <div class="tool-card-icon">
+            <a class="tool-card" asp-controller="ImageOptimizer" asp-action="Index">
+                <div class="tool-card-icon tool-card-icon--active">
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="3" width="18" height="18" rx="2"/>
                         <circle cx="8.5" cy="8.5" r="1.5"/>
@@ -81,11 +81,16 @@
                     </svg>
                 </div>
                 <div class="tool-card-body">
-                    <span class="tool-badge tool-badge--soon">Coming Soon</span>
+                    <span class="tool-badge tool-badge--ready">Ready</span>
                     <h2 class="tool-card-title">Image Optimizer</h2>
-                    <p class="tool-card-desc">Compress and resize images in bulk while preserving visual quality.</p>
+                    <p class="tool-card-desc">Compress and convert images in bulk while preserving quality.</p>
                 </div>
-            </div>
+                <div class="tool-card-arrow">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </a>
 
             <div class="tool-card tool-card--disabled tool-card--placeholder">
                 <div class="tool-card-icon">
