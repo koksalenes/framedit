@@ -1,9 +1,11 @@
+using Framedit.Services.MetadataCleaner;
 using Framedit.Services.VideoFrameParser;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IFrameParserService, FrameParserService>();
+builder.Services.AddScoped<IMetadataCleanerService, MetadataCleanerService>();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
