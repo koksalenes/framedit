@@ -1,0 +1,9 @@
+services:
+  framedit:
+    build: .
+    ports:
+      - "5050:5050"
+    volumes:
+      - /tmp/framedit:/tmp
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
