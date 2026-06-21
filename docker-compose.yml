@@ -1,9 +1,9 @@
 services:
-  framedit:
+  mediaration:
     build: .
     ports:
       - "5050:5050"
     volumes:
-      - /tmp/framedit:/tmp
+      - /tmp/mediaration:/tmp
     environment:
       - ASPNETCORE_ENVIRONMENT=Production

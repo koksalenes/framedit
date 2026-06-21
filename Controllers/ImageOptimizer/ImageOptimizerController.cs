@@ -1,9 +1,9 @@
-using Framedit.Constants;
-using Framedit.Models.ImageOptimizer;
-using Framedit.Services.ImageOptimizer;
+using Mediaration.Constants;
+using Mediaration.Models.ImageOptimizer;
+using Mediaration.Services.ImageOptimizer;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Framedit.Controllers.ImageOptimizer;
+namespace Mediaration.Controllers.ImageOptimizer;
 
 [Route("image-optimizer")]
 public class ImageOptimizerController : Controller

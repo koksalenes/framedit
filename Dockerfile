@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY framedit.csproj .
+COPY mediaration.csproj .
 RUN dotnet restore
 COPY . .
 RUN dotnet publish -c Release -o /app/publish
@@ -12,4 +12,4 @@ COPY --from=build /app/publish .
 ENV ASPNETCORE_URLS=http://+:5050
 ENV ASPNETCORE_ENVIRONMENT=Production
 EXPOSE 5050
-ENTRYPOINT ["dotnet", "framedit.dll"]
+ENTRYPOINT ["dotnet", "mediaration.dll"]

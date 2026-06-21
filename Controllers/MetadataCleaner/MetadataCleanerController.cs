@@ -1,8 +1,8 @@
-using Framedit.Constants;
-using Framedit.Services.MetadataCleaner;
+using Mediaration.Constants;
+using Mediaration.Services.MetadataCleaner;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Framedit.Controllers.MetadataCleaner;
+namespace Mediaration.Controllers.MetadataCleaner;
 
 [Route("metadata-cleaner")]
 public class MetadataCleanerController : Controller

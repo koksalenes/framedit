@@ -177,7 +177,7 @@
             const url  = URL.createObjectURL(blob);
             const a    = document.createElement('a');
             a.href     = url;
-            a.download = 'framedit-metadata-cleaner.zip';
+            a.download = 'mediaration-metadata-cleaner.zip';
             document.body.appendChild(a);
             a.click();
             a.remove();

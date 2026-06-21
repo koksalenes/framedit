@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.IO.Compression;
-using Framedit.Constants;
+using Mediaration.Constants;
 
-namespace Framedit.Services.ImageOptimizer;
+namespace Mediaration.Services.ImageOptimizer;
 
 public class ImageOptimizerService : IImageOptimizerService
 {
@@ -20,7 +20,7 @@ public class ImageOptimizerService : IImageOptimizerService
         bool stripMetadata,
         CancellationToken ct = default)
     {
-        var sessionDir = Path.Combine(Path.GetTempPath(), "framedit", "optimizer", Guid.NewGuid().ToString());
+        var sessionDir = Path.Combine(Path.GetTempPath(), "mediaration", "optimizer", Guid.NewGuid().ToString());
         var tmpDir     = Path.Combine(sessionDir, "tmp");
         var outDir     = Path.Combine(sessionDir, "out");
         Directory.CreateDirectory(tmpDir);

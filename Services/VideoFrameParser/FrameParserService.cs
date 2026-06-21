@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.IO.Compression;
-using Framedit.Constants;
+using Mediaration.Constants;
 
-namespace Framedit.Services.VideoFrameParser;
+namespace Mediaration.Services.VideoFrameParser;
 
 public class FrameParserService : IFrameParserService
 {
@@ -22,7 +22,7 @@ public class FrameParserService : IFrameParserService
         bool stripMetadata,
         CancellationToken ct = default)
     {
-        var sessionDir = Path.Combine(Path.GetTempPath(), "framedit", Guid.NewGuid().ToString());
+        var sessionDir = Path.Combine(Path.GetTempPath(), "mediaration", Guid.NewGuid().ToString());
         var framesDir  = Path.Combine(sessionDir, "frames");
         Directory.CreateDirectory(framesDir);
 

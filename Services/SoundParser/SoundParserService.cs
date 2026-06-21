@@ -1,7 +1,7 @@
 using System.Diagnostics;
-using Framedit.Constants;
+using Mediaration.Constants;
 
-namespace Framedit.Services.SoundParser;
+namespace Mediaration.Services.SoundParser;
 
 public class SoundParserService : ISoundParserService
 {
@@ -14,7 +14,7 @@ public class SoundParserService : ISoundParserService
 
     public async Task<string> ExtractAudioAsync(Stream videoStream, string fileName, string format, CancellationToken ct = default)
     {
-        var sessionDir = Path.Combine(Path.GetTempPath(), "framedit", "sound", Guid.NewGuid().ToString());
+        var sessionDir = Path.Combine(Path.GetTempPath(), "mediaration", "sound", Guid.NewGuid().ToString());
         Directory.CreateDirectory(sessionDir);
 
         var inputExt  = Path.GetExtension(fileName).ToLowerInvariant();

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Framedit.Constants;
+using Mediaration.Constants;
 
-namespace Framedit.Models.SoundParser;
+namespace Mediaration.Models.SoundParser;
 
 public class SoundParseRequestModel
 {

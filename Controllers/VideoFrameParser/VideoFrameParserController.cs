@@ -1,10 +1,10 @@
 using System.Text.RegularExpressions;
-using Framedit.Constants;
-using Framedit.Models.VideoFrameParser;
-using Framedit.Services.VideoFrameParser;
+using Mediaration.Constants;
+using Mediaration.Models.VideoFrameParser;
+using Mediaration.Services.VideoFrameParser;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Framedit.Controllers.VideoFrameParser;
+namespace Mediaration.Controllers.VideoFrameParser;
 
 [Route("video-frame-parser")]
 public class VideoFrameParserController : Controller

@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.IO.Compression;
-using Framedit.Constants;
+using Mediaration.Constants;
 
-namespace Framedit.Services.MetadataCleaner;
+namespace Mediaration.Services.MetadataCleaner;
 
 public class MetadataCleanerService : IMetadataCleanerService
 {
@@ -16,7 +16,7 @@ public class MetadataCleanerService : IMetadataCleanerService
 
     public async Task<string> CleanAsync(IEnumerable<IFormFile> files, CancellationToken ct = default)
     {
-        var sessionDir = Path.Combine(Path.GetTempPath(), "framedit", "metadata", Guid.NewGuid().ToString());
+        var sessionDir = Path.Combine(Path.GetTempPath(), "mediaration", "metadata", Guid.NewGuid().ToString());
         var tmpDir     = Path.Combine(sessionDir, "tmp");
         var outDir     = Path.Combine(sessionDir, "out");
         Directory.CreateDirectory(tmpDir);
