@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Framedit.Constants;
 
 namespace Framedit.Services.SoundParser;
 
@@ -22,14 +23,7 @@ public class SoundParserService : ISoundParserService
         await using (var fs = File.Create(inputPath))
             await videoStream.CopyToAsync(fs, ct);
 
-        var (outputExt, codecArgs) = format switch
-        {
-            "aac"  => (".aac",  "-vn -c:a aac -b:a 192k"),
-            "wav"  => (".wav",  "-vn -c:a pcm_s16le"),
-            "flac" => (".flac", "-vn -c:a flac"),
-            "ogg"  => (".ogg",  "-vn -c:a libvorbis -q:a 6"),
-            _      => (".mp3",  "-vn -c:a libmp3lame -q:a 2"),
-        };
+        var (outputExt, codecArgs) = ResolveAudioFormat(format);
 
         var outputPath = Path.Combine(sessionDir, $"audio{outputExt}");
         var args = $"-y -i \"{inputPath}\" {codecArgs} \"{outputPath}\"";
@@ -73,5 +67,18 @@ public class SoundParserService : ISoundParserService
         {
             _logger.LogWarning(ex, "Failed to cleanup session at {SessionPath}", sessionPath);
         }
+    }
+
+    private static (string ext, string codecArgs) ResolveAudioFormat(string format)
+    {
+        if (format.Equals(AppConstants.Ext.Aac.Name,  StringComparison.OrdinalIgnoreCase))
+            return (AppConstants.Ext.Aac.Extension,  "-vn -c:a aac -b:a 192k");
+        if (format.Equals(AppConstants.Ext.Wav.Name,  StringComparison.OrdinalIgnoreCase))
+            return (AppConstants.Ext.Wav.Extension,  "-vn -c:a pcm_s16le");
+        if (format.Equals(AppConstants.Ext.Flac.Name, StringComparison.OrdinalIgnoreCase))
+            return (AppConstants.Ext.Flac.Extension, "-vn -c:a flac");
+        if (format.Equals(AppConstants.Ext.Ogg.Name,  StringComparison.OrdinalIgnoreCase))
+            return (AppConstants.Ext.Ogg.Extension,  "-vn -c:a libvorbis -q:a 6");
+        return (AppConstants.Ext.Mp3.Extension, "-vn -c:a libmp3lame -q:a 2");
     }
 }

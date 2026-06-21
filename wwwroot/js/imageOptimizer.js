@@ -1,6 +1,5 @@
 (function () {
-    const MAX_FILES = 50;
-    const MAX_BYTES = 1_000_000_000;
+    const { MAX_FILES, MAX_BYTES, MAX_BYTES_DISPLAY } = APP;
 
     const fileInput     = document.getElementById('fileInput');
     const dropzone      = document.getElementById('dropzone');
@@ -105,8 +104,8 @@
         if (overCount || overSize) {
             limitWarning.hidden = false;
             limitWarnText.textContent = overCount
-                ? `Max ${MAX_FILES} images - remove ${files.length - MAX_FILES} to continue`
-                : 'Total exceeds 1 GB - remove some files to continue';
+                ? `Max ${MAX_FILES} images — remove ${files.length - MAX_FILES} to continue`
+                : `Total exceeds ${MAX_BYTES_DISPLAY} — remove some files to continue`;
             submitBtn.disabled = true;
         } else {
             limitWarning.hidden = true;
@@ -168,7 +167,7 @@
         const total = files.reduce((s, f) => s + f.size, 0);
         if (files.length === 0)        return showError('Please add at least one image.');
         if (files.length > MAX_FILES)  return showError(`Max ${MAX_FILES} images allowed.`);
-        if (total > MAX_BYTES)         return showError('Total size exceeds 1 GB.');
+        if (total > MAX_BYTES)         return showError(`Total size exceeds ${MAX_BYTES_DISPLAY}.`);
 
         setProcessing(true);
 

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Framedit.Constants;
 
 namespace Framedit.Models.VideoFrameParser;
 
@@ -11,11 +12,11 @@ public class ParseRequestModel
 
     [Required]
     [MaxLength(120)]
-    [RegularExpression(@"^[a-zA-Z0-9][a-zA-Z0-9_-]*$",
+    [RegularExpression(AppConstants.VideoFrameParser.BaseNamePattern,
         ErrorMessage = "Base name may only contain letters, numbers, hyphens (-) and underscores (_), and must start with a letter or number.")]
     public string BaseName { get; set; } = "frame";
 
-    public string Format { get; set; } = "jpg";
+    public string Format { get; set; } = AppConstants.Ext.Jpg.Name;
 
     public bool StripMetadata { get; set; } = false;
 }

@@ -1,18 +1,11 @@
 using System.Diagnostics;
 using System.IO.Compression;
+using Framedit.Constants;
 
 namespace Framedit.Services.ImageOptimizer;
 
 public class ImageOptimizerService : IImageOptimizerService
 {
-    private static readonly Dictionary<string, string> ExtToOutputExt = new(StringComparer.OrdinalIgnoreCase)
-    {
-        { ".jpg",  ".jpg"  }, { ".jpeg", ".jpg"  },
-        { ".png",  ".png"  }, { ".bmp",  ".bmp"  },
-        { ".tiff", ".tiff" }, { ".tif",  ".tiff" },
-        { ".webp", ".webp" },
-    };
-
     private readonly ILogger<ImageOptimizerService> _logger;
 
     public ImageOptimizerService(ILogger<ImageOptimizerService> logger)
@@ -95,7 +88,7 @@ public class ImageOptimizerService : IImageOptimizerService
         using var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, leaveOpen: false);
 
         foreach (var outFile in Directory.GetFiles(outDir).OrderBy(f => f))
-            await archive.CreateEntryFromFileAsync(outFile, $"framedit-optimized/{Path.GetFileName(outFile)}", CompressionLevel.Fastest, ct);
+            await archive.CreateEntryFromFileAsync(outFile, $"{AppConstants.ImageOptimizer.ZipFolder}/{Path.GetFileName(outFile)}", CompressionLevel.Fastest, ct);
 
         return zipPath;
     }
@@ -114,24 +107,21 @@ public class ImageOptimizerService : IImageOptimizerService
         }
     }
 
-    private static string ResolveOutputExt(string inputExt, string outputFormat) => outputFormat switch
+    private static string ResolveOutputExt(string inputExt, string outputFormat)
     {
-        "jpg"  => ".jpg",
-        "png"  => ".png",
-        "webp" => ".webp",
-        _      => ExtToOutputExt.TryGetValue(inputExt, out var mapped) ? mapped : inputExt,
-    };
+        if (outputFormat.Equals(AppConstants.Ext.Jpg.Name,  StringComparison.OrdinalIgnoreCase)) return AppConstants.Ext.Jpg.Extension;
+        if (outputFormat.Equals(AppConstants.Ext.Png.Name,  StringComparison.OrdinalIgnoreCase)) return AppConstants.Ext.Png.Extension;
+        if (outputFormat.Equals(AppConstants.Ext.Webp.Name, StringComparison.OrdinalIgnoreCase)) return AppConstants.Ext.Webp.Extension;
+        return AppConstants.ImageOptimizer.ExtToOutputExt.TryGetValue(inputExt, out var mapped) ? mapped : inputExt;
+    }
 
     private static string BuildCodecArgs(string outputExt, int quality)
     {
         var jpegQ = Math.Max(1, (int)Math.Round(1 + (100 - quality) * 30.0 / 99));
 
-        return outputExt switch
-        {
-            ".jpg"  => $"-q:v {jpegQ}",
-            ".png"  => "-compression_level 6",
-            ".webp" => $"-c:v libwebp -q:v {quality}",
-            _       => "",
-        };
+        if (outputExt.Equals(AppConstants.Ext.Jpg.Extension,  StringComparison.OrdinalIgnoreCase)) return $"-q:v {jpegQ}";
+        if (outputExt.Equals(AppConstants.Ext.Png.Extension,  StringComparison.OrdinalIgnoreCase)) return "-compression_level 6";
+        if (outputExt.Equals(AppConstants.Ext.Webp.Extension, StringComparison.OrdinalIgnoreCase)) return $"-c:v libwebp -q:v {quality}";
+        return "";
     }
 }

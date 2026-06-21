@@ -11,7 +11,7 @@
             All Tools
         </a>
         <h1 class="page-title">Image Optimizer</h1>
-        <p class="page-sub">Compress, resize and convert images - up to 50 at once.</p>
+        <p class="page-sub">Compress, resize and convert images up to 50 at once.</p>
     </div>
 </div>
 
@@ -40,9 +40,9 @@
                 </div>
                 <div>
                     <p class="empty-title">Drop your images here</p>
-                    <p class="empty-sub" style="margin-top:.35rem">or <button type="button" class="btn-link" id="browseBtn">browse files</button> - up to 50 at once</p>
+                    <p class="empty-sub" style="margin-top:.35rem">or <button type="button" class="btn-link" id="browseBtn">browse files</button> — up to @AppConstants.Upload.MaxFileCount at once</p>
                 </div>
-                <p class="empty-hint">JPG · PNG · WebP · BMP · TIFF &nbsp;-&nbsp; max 1 GB total</p>
+                <p class="empty-hint">JPG · PNG · WebP · BMP · TIFF &nbsp;—&nbsp; max @AppConstants.Upload.MaxTotalDisplay total</p>
             </div>
 
             <div class="info-grid">
@@ -51,8 +51,8 @@
                     <ul class="info-list">
                         <li>Reduce file size with quality control</li>
                         <li>Convert between JPG, PNG and WebP</li>
-                        <li>Resize to a maximum width and/or height</li>
                         <li>Strip EXIF and embedded metadata</li>
+                        <li>Up to @AppConstants.Upload.MaxFileCount images, max @AppConstants.Upload.MaxTotalDisplay total</li>
                     </ul>
                 </div>
                 <div class="info-card">
@@ -102,10 +102,10 @@
                     <div class="option-group">
                         <label class="option-label" for="outputFormat">Output Format</label>
                         <select name="OutputFormat" id="outputFormat" class="select">
-                            <option value="keep" selected>Keep original format</option>
-                            <option value="jpg">Convert to JPEG</option>
-                            <option value="png">Convert to PNG</option>
-                            <option value="webp">Convert to WebP</option>
+                            <option value="@AppConstants.ImageOptimizer.KeepFormat" selected>Keep original format</option>
+                            <option value="@AppConstants.Ext.Jpg.Name">Convert to JPEG</option>
+                            <option value="@AppConstants.Ext.Png.Name">Convert to PNG</option>
+                            <option value="@AppConstants.Ext.Webp.Name">Convert to WebP</option>
                         </select>
                     </div>
                     <div class="option-group" id="qualityGroup">
