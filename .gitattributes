@@ -1,0 +1,5 @@
+# Razor views are C# templates, not plain HTML
+*.cshtml linguist-language=C#
+
+# Exclude vendor libraries from language statistics
+wwwroot/lib/** linguist-vendored
