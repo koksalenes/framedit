@@ -1,3 +1,4 @@
+using Framedit.Constants;
 using Framedit.Services.ImageOptimizer;
 using Framedit.Services.MetadataCleaner;
 using Framedit.Services.SoundParser;
@@ -13,7 +14,7 @@ builder.Services.AddScoped<IImageOptimizerService, ImageOptimizerService>();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxRequestBodySize = 1_000_000_000;
+    options.Limits.MaxRequestBodySize = AppConstants.Upload.HttpRequestBytes;
 });
 
 var app = builder.Build();

@@ -40,14 +40,14 @@
                     <p class="empty-title">Drop your video here</p>
                     <p class="empty-sub" style="margin-top:.35rem">or <button type="button" class="btn-link" id="browseBtn">browse files</button> from your computer</p>
                 </div>
-                <p class="empty-hint">MP4 · MOV · AVI · MKV · WEBM · FLV · WMV &nbsp;-&nbsp; up to 1 GB</p>
+                <p class="empty-hint">MP4 · MOV · AVI · MKV · WEBM · FLV · WMV &nbsp;—&nbsp; up to @AppConstants.Upload.MaxTotalDisplay</p>
             </div>
 
             <div class="info-grid">
                 <div class="info-card">
                     <p class="info-title">How it works</p>
                     <ol class="info-steps">
-                        <li>Upload your video (up to 1 GB)</li>
+                        <li>Upload your video (up to @AppConstants.Upload.MaxTotalDisplay)</li>
                         <li>Choose the output audio format</li>
                         <li>Click Extract - FFmpeg processes it locally</li>
                         <li>Download the audio file directly</li>
@@ -103,11 +103,11 @@
                         <div class="option-group">
                             <label class="option-label" for="format">Output Format</label>
                             <select name="Format" id="format" class="select">
-                                <option value="mp3" selected>MP3 - most compatible</option>
-                                <option value="aac">AAC - smaller, modern</option>
-                                <option value="wav">WAV - lossless, uncompressed</option>
-                                <option value="flac">FLAC - lossless, compressed</option>
-                                <option value="ogg">OGG - open format</option>
+                                <option value="@AppConstants.Ext.Mp3.Name" selected>MP3 — most compatible</option>
+                                <option value="@AppConstants.Ext.Aac.Name">AAC — smaller, modern</option>
+                                <option value="@AppConstants.Ext.Wav.Name">WAV — lossless, uncompressed</option>
+                                <option value="@AppConstants.Ext.Flac.Name">FLAC — lossless, compressed</option>
+                                <option value="@AppConstants.Ext.Ogg.Name">OGG — open format</option>
                             </select>
                         </div>
                     </div>

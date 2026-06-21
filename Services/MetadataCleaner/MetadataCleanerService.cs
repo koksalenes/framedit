@@ -1,14 +1,11 @@
 using System.Diagnostics;
 using System.IO.Compression;
+using Framedit.Constants;
 
 namespace Framedit.Services.MetadataCleaner;
 
 public class MetadataCleanerService : IMetadataCleanerService
 {
-    private static readonly HashSet<string> VideoExtensions = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ".mp4", ".mov", ".avi", ".mkv", ".webm", ".m4v", ".flv", ".wmv", ".mpeg", ".mpg"
-    };
 
     private readonly ILogger<MetadataCleanerService> _logger;
 
@@ -49,7 +46,7 @@ public class MetadataCleanerService : IMetadataCleanerService
             await using (var fs = File.Create(tmpPath))
                 await file.OpenReadStream().CopyToAsync(fs, ct);
 
-            var codecArgs = VideoExtensions.Contains(fileExt) ? "-c copy" : "";
+            var codecArgs = AppConstants.VideoFrameParser.AllowedExtensions.Contains(fileExt) ? "-c copy" : "";
             var args = $"-y -i \"{tmpPath}\" -map_metadata -1 {codecArgs} \"{outPath}\"";
 
             _logger.LogInformation("Running ffmpeg: {Args}", args);
@@ -84,7 +81,7 @@ public class MetadataCleanerService : IMetadataCleanerService
         using var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, leaveOpen: false);
 
         foreach (var outFile in Directory.GetFiles(outDir).OrderBy(f => f))
-            await archive.CreateEntryFromFileAsync(outFile, $"framedit-metadata-cleaner/{Path.GetFileName(outFile)}", CompressionLevel.Fastest, ct);
+            await archive.CreateEntryFromFileAsync(outFile, $"{AppConstants.MetadataCleaner.ZipFolder}/{Path.GetFileName(outFile)}", CompressionLevel.Fastest, ct);
 
         return zipPath;
     }

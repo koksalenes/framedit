@@ -1,3 +1,4 @@
+using Framedit.Constants;
 using Framedit.Services.MetadataCleaner;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,15 +7,6 @@ namespace Framedit.Controllers.MetadataCleaner;
 [Route("metadata-cleaner")]
 public class MetadataCleanerController : Controller
 {
-    private const int MaxFileCount  = 50;
-    private const long MaxTotalSize = 1_000_000_000; // 1 GB (SI)
-
-    private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".tif", ".webp",
-        ".mp4", ".mov", ".avi", ".mkv", ".webm", ".m4v", ".flv", ".wmv", ".mpeg", ".mpg"
-    };
-
     private readonly IMetadataCleanerService _cleaner;
     private readonly ILogger<MetadataCleanerController> _logger;
 
@@ -28,8 +20,8 @@ public class MetadataCleanerController : Controller
     public IActionResult Index() => View();
 
     [HttpPost("clean")]
-    [RequestSizeLimit(1_000_000_000)]
-    [RequestFormLimits(MultipartBodyLengthLimit = 1_000_000_000, ValueCountLimit = 50)]
+    [RequestSizeLimit(AppConstants.Upload.HttpRequestBytes)]
+    [RequestFormLimits(MultipartBodyLengthLimit = AppConstants.Upload.HttpRequestBytes, ValueCountLimit = AppConstants.Upload.MaxFormValueCount)]
     public async Task<IActionResult> Clean(IFormFileCollection files, CancellationToken ct)
     {
         if (!ModelState.IsValid)
@@ -38,14 +30,13 @@ public class MetadataCleanerController : Controller
         if (files == null || files.Count == 0)
             return BadRequest(new { error = "Please select at least one file." });
 
-        if (files.Count > MaxFileCount)
-            return BadRequest(new { error = $"Maximum {MaxFileCount} files allowed at once." });
+        if (files.Count > AppConstants.Upload.MaxFileCount)
+            return BadRequest(new { error = $"Maximum {AppConstants.Upload.MaxFileCount} files allowed at once." });
 
-        var totalSize = files.Sum(f => f.Length);
-        if (totalSize > MaxTotalSize)
+        if (files.Sum(f => f.Length) > AppConstants.Upload.MaxTotalBytes)
             return BadRequest(new { error = "Total size exceeds the 1 GB limit." });
 
-        var invalid = files.FirstOrDefault(f => !AllowedExtensions.Contains(Path.GetExtension(f.FileName)));
+        var invalid = files.FirstOrDefault(f => !AppConstants.MetadataCleaner.AllowedExtensions.Contains(Path.GetExtension(f.FileName)));
         if (invalid != null)
             return BadRequest(new { error = $"Unsupported file type '{Path.GetExtension(invalid.FileName)}'." });
 
@@ -53,9 +44,8 @@ public class MetadataCleanerController : Controller
         try
         {
             zipPath = await _cleaner.CleanAsync(files, ct);
-
             var zipBytes = await System.IO.File.ReadAllBytesAsync(zipPath, ct);
-            return File(zipBytes, "application/zip", "framedit-metadata-cleaner.zip");
+            return File(zipBytes, AppConstants.Upload.ZipMimeType, AppConstants.MetadataCleaner.DownloadName);
         }
         catch (InvalidOperationException ex)
         {

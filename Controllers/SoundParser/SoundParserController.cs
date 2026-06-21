@@ -1,3 +1,4 @@
+using Framedit.Constants;
 using Framedit.Models.SoundParser;
 using Framedit.Services.SoundParser;
 using Microsoft.AspNetCore.Mvc;
@@ -7,16 +8,6 @@ namespace Framedit.Controllers.SoundParser;
 [Route("sound-parser")]
 public class SoundParserController : Controller
 {
-    private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ".mp4", ".mov", ".avi", ".mkv", ".webm", ".flv", ".wmv", ".m4v", ".mpeg", ".mpg"
-    };
-
-    private static readonly HashSet<string> AllowedFormats = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "mp3", "aac", "wav", "flac", "ogg"
-    };
-
     private readonly ISoundParserService _soundParser;
     private readonly ILogger<SoundParserController> _logger;
 
@@ -30,8 +21,8 @@ public class SoundParserController : Controller
     public IActionResult Index() => View();
 
     [HttpPost("extract")]
-    [RequestSizeLimit(1_000_000_000)]
-    [RequestFormLimits(MultipartBodyLengthLimit = 1_000_000_000)]
+    [RequestSizeLimit(AppConstants.Upload.HttpRequestBytes)]
+    [RequestFormLimits(MultipartBodyLengthLimit = AppConstants.Upload.HttpRequestBytes)]
     public async Task<IActionResult> Extract([FromForm] SoundParseRequestModel model, CancellationToken ct)
     {
         if (!ModelState.IsValid)
@@ -41,10 +32,10 @@ public class SoundParserController : Controller
             return BadRequest(new { error = "Please select a video file." });
 
         var ext = Path.GetExtension(model.VideoFile.FileName);
-        if (!AllowedExtensions.Contains(ext))
+        if (!AppConstants.SoundParser.AllowedExtensions.Contains(ext))
             return BadRequest(new { error = $"Unsupported file type '{ext}'." });
 
-        if (!AllowedFormats.Contains(model.Format))
+        if (!AppConstants.SoundParser.AllowedFormats.Contains(model.Format))
             return BadRequest(new { error = "Invalid output format." });
 
         string? outputPath = null;
@@ -55,10 +46,10 @@ public class SoundParserController : Controller
 
             var audioBytes   = await System.IO.File.ReadAllBytesAsync(outputPath, ct);
             var baseName     = Path.GetFileNameWithoutExtension(model.VideoFile.FileName);
-            var downloadName = $"{baseName}.{model.Format}";
-            var mimeType     = MimeType(model.Format);
+            var fileType     = ResolveFileType(model.Format);
+            var downloadName = $"{baseName}{fileType.Extension}";
 
-            return File(audioBytes, mimeType, downloadName);
+            return File(audioBytes, fileType.MimeType, downloadName);
         }
         catch (InvalidOperationException ex)
         {
@@ -75,12 +66,12 @@ public class SoundParserController : Controller
         }
     }
 
-    private static string MimeType(string format) => format switch
+    private static AppConstants.FileType ResolveFileType(string format)
     {
-        "aac"  => "audio/aac",
-        "wav"  => "audio/wav",
-        "flac" => "audio/flac",
-        "ogg"  => "audio/ogg",
-        _      => "audio/mpeg",
-    };
+        if (format.Equals(AppConstants.Ext.Aac.Name,  StringComparison.OrdinalIgnoreCase)) return AppConstants.Ext.Aac;
+        if (format.Equals(AppConstants.Ext.Wav.Name,  StringComparison.OrdinalIgnoreCase)) return AppConstants.Ext.Wav;
+        if (format.Equals(AppConstants.Ext.Flac.Name, StringComparison.OrdinalIgnoreCase)) return AppConstants.Ext.Flac;
+        if (format.Equals(AppConstants.Ext.Ogg.Name,  StringComparison.OrdinalIgnoreCase)) return AppConstants.Ext.Ogg;
+        return AppConstants.Ext.Mp3;
+    }
 }

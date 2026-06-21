@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Framedit.Constants;
 using Framedit.Models.VideoFrameParser;
 using Framedit.Services.VideoFrameParser;
 using Microsoft.AspNetCore.Mvc;
@@ -8,12 +9,8 @@ namespace Framedit.Controllers.VideoFrameParser;
 [Route("video-frame-parser")]
 public class VideoFrameParserController : Controller
 {
-    private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ".mp4", ".mov", ".avi", ".mkv", ".webm", ".flv", ".wmv", ".m4v", ".mpeg", ".mpg"
-    };
-
-    private static readonly Regex BaseNameRegex = new(@"^[a-zA-Z0-9][a-zA-Z0-9_-]*$", RegexOptions.Compiled);
+    private static readonly Regex BaseNameRegex =
+        new(AppConstants.VideoFrameParser.BaseNamePattern, RegexOptions.Compiled);
 
     private readonly IFrameParserService _frameParser;
     private readonly ILogger<VideoFrameParserController> _logger;
@@ -28,23 +25,19 @@ public class VideoFrameParserController : Controller
     public IActionResult Index() => View();
 
     [HttpPost("parse")]
-    [RequestSizeLimit(1_000_000_000)]
-    [RequestFormLimits(MultipartBodyLengthLimit = 1_000_000_000)]
+    [RequestSizeLimit(AppConstants.Upload.HttpRequestBytes)]
+    [RequestFormLimits(MultipartBodyLengthLimit = AppConstants.Upload.HttpRequestBytes)]
     public async Task<IActionResult> Parse([FromForm] ParseRequestModel model, CancellationToken ct)
     {
         if (!ModelState.IsValid)
-        {
-            var firstError = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage
-                             ?? "Invalid request.";
-            return BadRequest(new { error = firstError });
-        }
+            return BadRequest(new { error = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage ?? "Invalid request." });
 
         if (model.VideoFile == null || model.VideoFile.Length == 0)
             return BadRequest(new { error = "Please select a video file." });
 
         var ext = Path.GetExtension(model.VideoFile.FileName);
-        if (!AllowedExtensions.Contains(ext))
-            return BadRequest(new { error = $"Unsupported file type '{ext}'. Accepted: {string.Join(", ", AllowedExtensions)}" });
+        if (!AppConstants.VideoFrameParser.AllowedExtensions.Contains(ext))
+            return BadRequest(new { error = $"Unsupported file type '{ext}'." });
 
         if (model.Fps is < 0 or > 120)
             return BadRequest(new { error = "FPS must be between 0 and 120." });
@@ -62,10 +55,10 @@ public class VideoFrameParserController : Controller
                 model.Fps, model.Format,
                 baseName, model.StripMetadata, ct);
 
-            var zipBytes    = await System.IO.File.ReadAllBytesAsync(zipPath, ct);
+            var zipBytes     = await System.IO.File.ReadAllBytesAsync(zipPath, ct);
             var downloadName = $"{baseName}.zip";
 
-            return File(zipBytes, "application/zip", downloadName);
+            return File(zipBytes, AppConstants.Upload.ZipMimeType, downloadName);
         }
         catch (InvalidOperationException ex)
         {
@@ -78,8 +71,7 @@ public class VideoFrameParserController : Controller
         }
         finally
         {
-            if (zipPath != null)
-                _frameParser.Cleanup(zipPath);
+            if (zipPath != null) _frameParser.Cleanup(zipPath);
         }
     }
 }

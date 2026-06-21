@@ -77,10 +77,11 @@
 
     <footer class="footer">
         <div class="footer-inner">
-            <span>@DateTime.Now.Year Framedit.</span>
+            <span>@DateTime.Now.Year - Designed for fast, local media management.</span>
         </div>
     </footer>
 
+    <script src="~/js/constants.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

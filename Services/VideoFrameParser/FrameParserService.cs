@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO.Compression;
+using Framedit.Constants;
 
 namespace Framedit.Services.VideoFrameParser;
 
@@ -31,20 +32,15 @@ public class FrameParserService : IFrameParserService
         await using (var fs = File.Create(videoPath))
             await videoStream.CopyToAsync(fs, ct);
 
-        var (ext, codecArgs) = format switch
-        {
-            "png"  => (".png",  "-compression_level 3"),
-            "webp" => (".webp", "-c:v libwebp -q:v 85"),
-            _      => (".jpg",  "-q:v 2"),
-        };
+        var (ext, codecArgs) = ResolveFrameFormat(format);
 
-        var vfArgs    = fps > 0 ? $"-vf \"fps={fps}\"" : "";
-        var metaArgs  = stripMetadata ? "-map_metadata -1" : "";
+        var vfArgs     = fps > 0 ? $"-vf \"fps={fps}\"" : "";
+        var metaArgs   = stripMetadata ? "-map_metadata -1" : "";
         var tmpPattern = Path.Combine(framesDir, $"tmp_%08d{ext}");
+        var args       = $"-i \"{videoPath}\" {vfArgs} {codecArgs} {metaArgs} \"{tmpPattern}\"";
 
-        var args = $"-i \"{videoPath}\" {vfArgs} {codecArgs} {metaArgs} \"{tmpPattern}\"";
-
-        _logger.LogInformation("Running ffmpeg: {Args}", args);
+        if (_logger.IsEnabled(LogLevel.Information))
+            _logger.LogInformation("Running ffmpeg: {Args}", args);
 
         var psi = new ProcessStartInfo
         {
@@ -69,7 +65,6 @@ public class FrameParserService : IFrameParserService
                 $"FFmpeg failed with exit code {process.ExitCode}. Ensure the file is a valid video.");
         }
 
-        // Collect temp files and rename with dynamic padding
         var tmpFiles = Directory.GetFiles(framesDir, $"tmp_*{ext}")
                                 .OrderBy(f => f)
                                 .ToArray();
@@ -105,5 +100,14 @@ public class FrameParserService : IFrameParserService
         {
             _logger.LogWarning(ex, "Failed to cleanup session at {SessionPath}", sessionPath);
         }
+    }
+
+    private static (string ext, string codecArgs) ResolveFrameFormat(string format)
+    {
+        if (format.Equals(AppConstants.Ext.Png.Name,  StringComparison.OrdinalIgnoreCase))
+            return (AppConstants.Ext.Png.Extension,  "-compression_level 3");
+        if (format.Equals(AppConstants.Ext.Webp.Name, StringComparison.OrdinalIgnoreCase))
+            return (AppConstants.Ext.Webp.Extension, "-c:v libwebp -q:v 85");
+        return (AppConstants.Ext.Jpg.Extension, "-q:v 2");
     }
 }

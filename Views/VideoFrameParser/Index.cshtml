@@ -40,14 +40,14 @@
                     <p class="empty-title">Drop your video here</p>
                     <p class="empty-sub" style="margin-top:.35rem">or <button type="button" class="btn-link" id="browseBtn">browse files</button> from your computer</p>
                 </div>
-                <p class="empty-hint">MP4 · MOV · AVI · MKV · WEBM · FLV · WMV &nbsp;-&nbsp; up to 1 GB</p>
+                <p class="empty-hint">MP4 · MOV · AVI · MKV · WEBM · FLV · WMV &nbsp;—&nbsp; up to @AppConstants.Upload.MaxTotalDisplay</p>
             </div>
 
             <div class="info-grid">
                 <div class="info-card">
                     <p class="info-title">How it works</p>
                     <ol class="info-steps">
-                        <li>Upload your video (up to 1&nbsp;GB)</li>
+                        <li>Upload your video (up to @AppConstants.Upload.MaxTotalDisplay)</li>
                         <li>Name your frames and configure settings</li>
                         <li>Click Extract - FFmpeg processes it locally</li>
                         <li>Download all frames as a single ZIP</li>
@@ -129,9 +129,9 @@
                         <div class="option-group">
                             <label class="option-label" for="format">Output Format</label>
                             <select name="Format" id="format" class="select">
-                                <option value="jpg" selected>JPEG - smaller files</option>
-                                <option value="png">PNG - lossless</option>
-                                <option value="webp">WebP - modern, efficient</option>
+                                <option value="@AppConstants.Ext.Jpg.Name" selected>JPEG — smaller files</option>
+                                <option value="@AppConstants.Ext.Png.Name">PNG — lossless</option>
+                                <option value="@AppConstants.Ext.Webp.Name">WebP — modern, efficient</option>
                             </select>
                         </div>
                     </div>
