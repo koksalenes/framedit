@@ -1,4 +1,4 @@
-namespace Framedit.Services.VideoFrameParser;
+namespace Mediaration.Services.VideoFrameParser;
 
 public interface IFrameParserService
 {

@@ -1,4 +1,4 @@
-namespace Framedit.Models;
+namespace Mediaration.Models;
 
 public class ErrorViewModel
 {

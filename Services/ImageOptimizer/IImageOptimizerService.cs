@@ -1,4 +1,4 @@
-namespace Framedit.Services.ImageOptimizer;
+namespace Mediaration.Services.ImageOptimizer;
 
 public interface IImageOptimizerService
 {

@@ -1,4 +1,4 @@
-namespace Framedit.Services.MetadataCleaner;
+namespace Mediaration.Services.MetadataCleaner;
 
 public interface IMetadataCleanerService
 {

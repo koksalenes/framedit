@@ -1,8 +1,8 @@
 using System.Diagnostics;
-using Framedit.Models;
+using Mediaration.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Framedit.Controllers;
+namespace Mediaration.Controllers;
 
 public class HomeController : Controller
 {

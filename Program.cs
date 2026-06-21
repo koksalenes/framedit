@@ -1,8 +1,8 @@
-using Framedit.Constants;
-using Framedit.Services.ImageOptimizer;
-using Framedit.Services.MetadataCleaner;
-using Framedit.Services.SoundParser;
-using Framedit.Services.VideoFrameParser;
+using Mediaration.Constants;
+using Mediaration.Services.ImageOptimizer;
+using Mediaration.Services.MetadataCleaner;
+using Mediaration.Services.SoundParser;
+using Mediaration.Services.VideoFrameParser;
 
 var builder = WebApplication.CreateBuilder(args);
 

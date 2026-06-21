@@ -1,4 +1,4 @@
-namespace Framedit.Constants;
+namespace Mediaration.Constants;
 
 public static class AppConstants
 {
@@ -69,8 +69,8 @@ public static class AppConstants
                 Ext.Mpg.Extension,
             };
 
-        public const string ZipFolder    = "framedit-metadata-cleaner";
-        public const string DownloadName = "framedit-metadata-cleaner.zip";
+        public const string ZipFolder    = "mediaration-metadata-cleaner";
+        public const string DownloadName = "mediaration-metadata-cleaner.zip";
     }
 
     public static class SoundParser
@@ -95,8 +95,8 @@ public static class AppConstants
     public static class ImageOptimizer
     {
         public const string KeepFormat   = "keep";
-        public const string ZipFolder    = "framedit-optimized";
-        public const string DownloadName = "framedit-optimized.zip";
+        public const string ZipFolder    = "mediaration-optimized";
+        public const string DownloadName = "mediaration-optimized.zip";
 
         public static readonly IReadOnlySet<string> AllowedExtensions =
             new HashSet<string>(StringComparer.OrdinalIgnoreCase)

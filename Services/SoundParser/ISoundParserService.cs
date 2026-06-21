@@ -1,4 +1,4 @@
-namespace Framedit.Services.SoundParser;
+namespace Mediaration.Services.SoundParser;
 
 public interface ISoundParserService
 {

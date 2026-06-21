@@ -1,9 +1,9 @@
-using Framedit.Constants;
-using Framedit.Models.SoundParser;
-using Framedit.Services.SoundParser;
+using Mediaration.Constants;
+using Mediaration.Models.SoundParser;
+using Mediaration.Services.SoundParser;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Framedit.Controllers.SoundParser;
+namespace Mediaration.Controllers.SoundParser;
 
 [Route("sound-parser")]
 public class SoundParserController : Controller

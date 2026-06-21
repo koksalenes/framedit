@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Framedit.Constants;
+using Mediaration.Constants;
 
-namespace Framedit.Models.ImageOptimizer;
+namespace Mediaration.Models.ImageOptimizer;
 
 public class ImageOptimizeRequestModel
 {
