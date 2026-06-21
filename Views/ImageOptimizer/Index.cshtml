@@ -1,0 +1,160 @@
+@{
+    ViewData["Title"] = "Image Optimizer";
+}
+
+<div class="page-header">
+    <div class="container">
+        <a class="back-link" asp-controller="Home" asp-action="Index">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            All Tools
+        </a>
+        <h1 class="page-title">Image Optimizer</h1>
+        <p class="page-sub">Compress, resize and convert images up to 50 at once.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div id="errorBanner" class="alert alert-error" hidden>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="errorText"></span>
+    </div>
+
+    <form id="optimizeForm">
+        @Html.AntiForgeryToken()
+        <input type="file" id="fileInput" name="Files" multiple
+               accept="image/jpeg,image/png,image/webp,image/bmp,image/tiff,.jpg,.jpeg,.png,.webp,.bmp,.tiff,.tif" hidden />
+
+        @* Empty State *@
+        <div id="emptyState">
+            <div class="empty-state" id="dropzone">
+                <div class="empty-icon">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <path d="M21 15l-5-5L5 21"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="empty-title">Drop your images here</p>
+                    <p class="empty-sub" style="margin-top:.35rem">or <button type="button" class="btn-link" id="browseBtn">browse files</button> — up to @AppConstants.Upload.MaxFileCount at once</p>
+                </div>
+                <p class="empty-hint">JPG · PNG · WebP · BMP · TIFF &nbsp;—&nbsp; max @AppConstants.Upload.MaxTotalDisplay total</p>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <p class="info-title">What you can do</p>
+                    <ul class="info-list">
+                        <li>Reduce file size with quality control</li>
+                        <li>Convert between JPG, PNG and WebP</li>
+                        <li>Strip EXIF and embedded metadata</li>
+                        <li>Up to @AppConstants.Upload.MaxFileCount images, max @AppConstants.Upload.MaxTotalDisplay total</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <p class="info-title">Supported formats</p>
+                    <div class="format-tags">
+                        <span class="tag">JPG</span><span class="tag">PNG</span><span class="tag">WebP</span>
+                        <span class="tag">BMP</span><span class="tag">TIFF</span>
+                    </div>
+                    <p style="font-size:.78rem;color:var(--text-3);margin-top:.75rem">Aspect ratio is always preserved when resizing.</p>
+                </div>
+            </div>
+        </div>
+
+        @* File List + Settings *@
+        <div id="fileListState" hidden>
+
+            <div class="filelist-card">
+                <div class="filelist-header">
+                    <div class="filelist-stats">
+                        <span id="fileCount">0 files</span>
+                        <span class="filelist-sep">·</span>
+                        <span id="totalSize">0 B</span>
+                        <span class="filelist-limit" id="limitWarning" hidden>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                            <span id="limitWarningText"></span>
+                        </span>
+                    </div>
+                    <button type="button" class="btn-add" id="addMoreBtn">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        Add more
+                    </button>
+                </div>
+                <ul class="file-list" id="fileList"></ul>
+            </div>
+
+            <div class="options-card">
+                <div class="options-header">
+                    <p class="options-title">Optimization Settings</p>
+                </div>
+
+                <div class="options-row">
+                    <div class="option-group">
+                        <label class="option-label" for="outputFormat">Output Format</label>
+                        <select name="OutputFormat" id="outputFormat" class="select">
+                            <option value="@AppConstants.ImageOptimizer.KeepFormat" selected>Keep original format</option>
+                            <option value="@AppConstants.Ext.Jpg.Name">Convert to JPEG</option>
+                            <option value="@AppConstants.Ext.Png.Name">Convert to PNG</option>
+                            <option value="@AppConstants.Ext.Webp.Name">Convert to WebP</option>
+                        </select>
+                    </div>
+                    <div class="option-group" id="qualityGroup">
+                        <label class="option-label" for="qualitySlider">
+                            Quality - <span id="qualityValue">85</span>
+                        </label>
+                        <input type="range" name="Quality" id="qualitySlider" class="quality-slider"
+                               min="1" max="100" value="85" />
+                        <p class="field-hint" id="qualityHint">Applies to JPEG and WebP output.</p>
+                    </div>
+                </div>
+
+                <div class="options-row options-row--toggle">
+                    <label class="toggle-label" for="stripMetadata">
+                        <span class="toggle-wrap">
+                            <input type="checkbox" name="StripMetadata" id="stripMetadata" value="true" class="toggle-input" />
+                            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                        </span>
+                        <span class="toggle-text">
+                            Strip metadata
+                            <span class="toggle-desc">Removes EXIF, GPS and embedded tags from output images</span>
+                        </span>
+                    </label>
+                </div>
+
+                <div class="actions-row">
+                    <button type="submit" class="btn-primary" id="submitBtn">
+                        <span class="btn-label">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Optimize &amp; Download
+                        </span>
+                        <span class="btn-processing" hidden>
+                            <span class="spinner"></span>
+                            Optimizing…
+                        </span>
+                    </button>
+                    <button type="button" class="btn-ghost" id="clearAllBtn">Clear all</button>
+                    <p class="actions-hint">Output is packed into a ZIP</p>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+<script src="~/js/imageOptimizer.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,121 @@
+@{
+    ViewData["Title"] = "Metadata Cleaner";
+}
+
+<div class="page-header">
+    <div class="container">
+        <a class="back-link" asp-controller="Home" asp-action="Index">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            All Tools
+        </a>
+        <h1 class="page-title">Metadata Cleaner</h1>
+        <p class="page-sub">Strip EXIF, GPS and embedded tags from images, videos and PDFs.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div id="errorBanner" class="alert alert-error" hidden>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="errorText"></span>
+    </div>
+
+    <form id="cleanForm">
+        @Html.AntiForgeryToken()
+        <input type="file" id="fileInput" name="files" multiple
+               accept="image/*,video/*,.pdf,.heic,.heif,.raw,.cr2,.nef,.arw,.dng,.mkv,.webm,.flv,.wmv" hidden />
+
+        <div id="emptyState">
+            <div class="empty-state" id="dropzone">
+                <div class="empty-icon">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <path d="M14 2v6h6M9 13h6M9 17h4"/>
+                        <line x1="12" y1="6" x2="12" y2="6"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="empty-title">Drop your files here</p>
+                    <p class="empty-sub" style="margin-top:.35rem">or <button type="button" class="btn-link" id="browseBtn">browse files</button> — up to @AppConstants.Upload.MaxFileCount at once</p>
+                </div>
+                <p class="empty-hint">Images · Videos &nbsp;—&nbsp; max @AppConstants.Upload.MaxTotalDisplay total</p>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <p class="info-title">What gets removed</p>
+                    <ul class="info-list">
+                        <li>GPS location coordinates</li>
+                        <li>Camera make, model &amp; settings</li>
+                        <li>Author, copyright &amp; software tags</li>
+                        <li>Timestamps &amp; creation dates</li>
+                        <li>Thumbnail previews</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <p class="info-title">Supported formats</p>
+                    <div class="format-tags">
+                        <span class="tag">JPG</span><span class="tag">PNG</span><span class="tag">WebP</span>
+                        <span class="tag">HEIC</span><span class="tag">TIFF</span><span class="tag">RAW</span>
+                        <span class="tag">CR2</span><span class="tag">NEF</span><span class="tag">ARW</span>
+                        <span class="tag">MP4</span><span class="tag">MOV</span><span class="tag">MKV</span>
+                        <span class="tag">PDF</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="fileListState" hidden>
+            <div class="filelist-card">
+                <div class="filelist-header">
+                    <div class="filelist-stats">
+                        <span id="fileCount">0 files</span>
+                        <span class="filelist-sep">·</span>
+                        <span id="totalSize">0 B</span>
+                        <span class="filelist-limit" id="limitWarning" hidden>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                            <span id="limitWarningText"></span>
+                        </span>
+                    </div>
+                    <button type="button" class="btn-add" id="addMoreBtn">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        Add more
+                    </button>
+                </div>
+
+                <ul class="file-list" id="fileList"></ul>
+            </div>
+
+            <div class="actions-bar">
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    <span class="btn-label">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Clean &amp; Download
+                    </span>
+                    <span class="btn-processing" hidden>
+                        <span class="spinner"></span>
+                        Cleaning…
+                    </span>
+                </button>
+                <button type="button" class="btn-ghost" id="clearAllBtn">Clear all</button>
+                <p class="actions-hint">All metadata is stripped server-side. Files are deleted immediately after download.</p>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+<script src="~/js/metadataCleaner.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,9 @@
+services:
+  mediaration:
+    build: .
+    ports:
+      - "5050:5050"
+    volumes:
+      - /tmp/mediaration:/tmp
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production

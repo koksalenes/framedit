@@ -1,29 +1,35 @@
+using Mediaration.Constants;
+using Mediaration.Services.ImageOptimizer;
+using Mediaration.Services.MetadataCleaner;
+using Mediaration.Services.SoundParser;
+using Mediaration.Services.VideoFrameParser;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IFrameParserService, FrameParserService>();
+builder.Services.AddScoped<IMetadataCleanerService, MetadataCleanerService>();
+builder.Services.AddScoped<ISoundParserService, SoundParserService>();
+builder.Services.AddScoped<IImageOptimizerService, ImageOptimizerService>();
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = AppConstants.Upload.HttpRequestBytes;
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseStaticFiles();
 app.UseAuthorization();
-
-app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
