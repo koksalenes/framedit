@@ -87,8 +87,8 @@
         if (overCount || overSize) {
             limitWarning.hidden = false;
             limitWarnText.textContent = overCount
-                ? `Max ${MAX_FILES} files — remove ${files.length - MAX_FILES} to continue`
-                : `Total exceeds ${MAX_BYTES_DISPLAY} — remove some files to continue`;
+                ? `Max ${MAX_FILES} files - remove ${files.length - MAX_FILES} to continue`
+                : `Total exceeds ${MAX_BYTES_DISPLAY} - remove some files to continue`;
             submitBtn.disabled = true;
         } else {
             limitWarning.hidden = true;
